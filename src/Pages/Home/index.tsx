@@ -12,7 +12,7 @@ import {
 import { HomeOutlined, DollarOutlined, RiseOutlined } from "@ant-design/icons";
 import { Line } from "@ant-design/charts";
 import { useState, useEffect } from "react";
-import { readAllCSVFiles } from "./utils";
+import { readAllCSVFiles, citys } from "./utils";
 
 const { Text } = Typography;
 
@@ -20,23 +20,15 @@ export const HomePage = () => {
   const [allData, setAllData] = useState<
     Record<string, Record<string, { hb: number; tb: number; cur: number }>>
   >({});
-  const [selectedCity, setSelectedCity] = useState<string>("北京");
+  const [selectedCities, setSelectedCities] = useState<string[]>(["北京"]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [cities, setCities] = useState<string[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
         const data = await readAllCSVFiles();
-        console.log("加载的数据:", data);
         setAllData(data);
-
-        // 从数据中提取城市列表
-        const firstFile = Object.values(data)[0];
-        if (firstFile) {
-          setCities(Object.keys(firstFile));
-        }
       } catch (error) {
         console.error("加载数据失败:", error);
       } finally {
@@ -53,17 +45,22 @@ export const HomePage = () => {
 
     Object.entries(allData).forEach(([fileName, fileData]: [string, any]) => {
       const month = fileName;
-      const cityData = fileData[selectedCity];
 
-      if (cityData && cityData.cur > 0) {
-        // 确保有有效数据
-        chartData.push({
-          month,
-          price: cityData.cur,
-          hb: cityData.hb,
-          tb: cityData.tb,
-        });
-      }
+      // 为每个选中的城市生成数据
+      selectedCities.forEach((cityName) => {
+        const cityData = fileData[cityName];
+
+        if (cityData && cityData.cur > 0) {
+          // 确保有有效数据
+          chartData.push({
+            month,
+            city: cityName,
+            price: cityData.cur,
+            hb: cityData.hb,
+            tb: cityData.tb,
+          });
+        }
+      });
     });
 
     // 按月份排序
@@ -75,20 +72,17 @@ export const HomePage = () => {
   };
 
   const chartData = generateChartData();
-  console.log("chartData", chartData);
-  console.log("allData keys:", Object.keys(allData));
-  console.log("selectedCity:", selectedCity);
-  console.log("cities:", cities);
 
   const lineConfig = {
     data: chartData,
     xField: "month",
     yField: "price",
+    colorField: "city", // 按城市区分颜色
     shapeField: "smooth",
     scale: {
       y: {
         domainMin: 70, // 纵轴起始值
-        domainMax: 120, // 纵轴最大值
+        domainMax: 110, // 纵轴最大值
         nice: true, // 自动调整刻度为美观的数值
       },
     },
@@ -113,13 +107,35 @@ export const HomePage = () => {
           </Text>
           <div className="ml-auto">
             <Select
-              value={selectedCity}
-              onChange={setSelectedCity}
-              style={{ width: 120 }}
-              placeholder="选择城市"
-              options={cities.map((city) => ({ label: city, value: city }))}
+              mode="multiple"
+              value={selectedCities}
+              onChange={(values) => {
+                // 限制最多选择5个城市
+                if (values.length <= 5) {
+                  setSelectedCities(values);
+                } else {
+                  // 如果超过5个，则移除第一个，并添加新的
+                  const newValues = values.slice(1, 5);
+                  newValues.push(values[values.length - 1]);
+                  setSelectedCities(newValues);
+                }
+              }}
+              style={{ width: 500 }}
+              placeholder="选择城市（最多5个）"
+              maxTagCount={5}
+              maxTagTextLength={5}
+              options={citys.map((city) => ({ label: city, value: city }))}
             />
           </div>
+        </Row>
+
+        {/* 主要内容区域 */}
+        <Row gutter={[24, 24]}>
+          <Col xs={24}>
+            <Card title="房价走势图">
+              <Line {...lineConfig} />
+            </Card>
+          </Col>
         </Row>
 
         {/* 统计卡片 */}
@@ -129,7 +145,8 @@ export const HomePage = () => {
               <Statistic
                 title="当前房价"
                 value={
-                  (allData && Object.values(allData)[0]?.[selectedCity]?.cur) ||
+                  (allData &&
+                    Object.values(allData)[0]?.[selectedCities[0]]?.cur) ||
                   0
                 }
                 prefix={<DollarOutlined />}
@@ -143,7 +160,8 @@ export const HomePage = () => {
               <Statistic
                 title="环比涨幅"
                 value={
-                  (allData && Object.values(allData)[0]?.[selectedCity]?.hb) ||
+                  (allData &&
+                    Object.values(allData)[0]?.[selectedCities[0]]?.hb) ||
                   0
                 }
                 prefix={<RiseOutlined />}
@@ -157,7 +175,8 @@ export const HomePage = () => {
               <Statistic
                 title="同比涨幅"
                 value={
-                  (allData && Object.values(allData)[0]?.[selectedCity]?.tb) ||
+                  (allData &&
+                    Object.values(allData)[0]?.[selectedCities[0]]?.tb) ||
                   0
                 }
                 prefix={<RiseOutlined />}
@@ -166,22 +185,14 @@ export const HomePage = () => {
               />
             </Card>
           </Col>
-          {/* <Col xs={24} sm={12} lg={6}>
+          <Col xs={24} sm={12} lg={6}>
             <Card>
               <Statistic
-                title="数据月份"
-                value={Object.keys(allData)[0]?.replace(".csv", "") || "-"}
+                title="选中城市"
+                value={selectedCities.length}
+                suffix={`/5`}
                 valueStyle={{ color: "#722ed1" }}
               />
-            </Card>
-          </Col> */}
-        </Row>
-
-        {/* 主要内容区域 */}
-        <Row gutter={[24, 24]}>
-          <Col xs={24}>
-            <Card title="房价走势图">
-              <Line {...lineConfig} />
             </Card>
           </Col>
         </Row>

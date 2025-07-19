@@ -35,7 +35,7 @@ function parseCSV(csvString: string): FileData {
       data[cityName] = {
         hb: parseFloat(values[1]) || 0,  // 环比
         tb: parseFloat(values[2]) || 0,  // 同比
-        cur: parseFloat(values[3]) || 0, // 实际房价（第5列）
+        cur: parseFloat(values[4]) || 0, // 实际房价（第5列）
       };
     }
   }
@@ -77,7 +77,7 @@ export async function readAllCSVFiles(): Promise<AllData> {
   }
 }
 
-const city70s = [
+export const citys = [
   "北京",
   "唐山",
   "天津",
