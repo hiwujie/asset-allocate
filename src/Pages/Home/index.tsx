@@ -3,13 +3,15 @@ import {
   Typography,
   Card,
   Col,
-  Progress,
   Flex,
   Select,
   Spin,
   Table,
+  Tag,
+  Tooltip,
+  Divider,
 } from "antd";
-import { HomeOutlined } from "@ant-design/icons";
+import { HomeOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { Line } from "@ant-design/charts";
 import { useState, useEffect } from "react";
 import { readAllCSVFiles, citys } from "./utils";
@@ -37,6 +39,51 @@ const columns = [
   {
     title: "今年以来平均(上年同期=100)",
     dataIndex: "currAvg",
+  },
+  {
+    title: "相比 2022-05 涨跌幅",
+    dataIndex: "cur",
+    render: (_: number, record: any) => {
+      const down = Number((record.cur - 100).toFixed(2));
+      if (down < 0) {
+        return <Tag color="green">{down}%</Tag>;
+      } else if (down > 0) {
+        return <Tag color="red">{down}%</Tag>;
+      }
+      return <Tag color="default">持平</Tag>;
+    },
+  },
+];
+
+const downTop10Columns = [
+  {
+    title: "城市",
+    dataIndex: "city",
+  },
+  {
+    title: (
+      <>
+        <Text className="mr-2">最新 / 2025-05 房价</Text>
+        <Tooltip title="当前房价 / 2022-05 房价">
+          <QuestionCircleOutlined className="text-sm" />
+        </Tooltip>
+      </>
+    ),
+    dataIndex: "cur",
+    render: (text: number) => `${text} / 100`,
+  },
+  {
+    title: "涨跌幅",
+    dataIndex: "cur",
+    render: (text: number) => {
+      const down = Number((text - 100).toFixed(2));
+      if (down < 0) {
+        return <Tag color="green">{down}%</Tag>;
+      } else if (down > 0) {
+        return <Tag color="red">{down}%</Tag>;
+      }
+      return null;
+    },
   },
 ];
 
@@ -135,7 +182,26 @@ export const HomePage = () => {
     return tableData;
   };
 
+  const generateDownTop10Data = () => {
+    const downTop10Data: any[] = [];
+    const latestMonth = Object.keys(allData).sort().pop();
+    if (latestMonth) {
+      const latestData = allData[latestMonth];
+      const downTop10 = Object.entries(latestData)
+        .sort((a, b) => b[1].cur - a[1].cur)
+        .slice(0, 10);
+      downTop10.forEach(([city, data]) => {
+        downTop10Data.push({
+          city,
+          cur: data.cur,
+        });
+      });
+    }
+    return downTop10Data;
+  };
+
   const tableData = generateTableData();
+  const downTop10Data = generateDownTop10Data();
 
   const lineConfig = {
     data: chartData,
@@ -210,12 +276,27 @@ export const HomePage = () => {
               }
             >
               <Line {...lineConfig} />
+              <Divider />
+              <Table
+                dataSource={tableData}
+                columns={columns}
+                pagination={false}
+              />
             </Card>
           </Col>
         </Row>
 
-        {/* 选中城市的环比，同比，当前平均值*/}
-        <Table dataSource={tableData} columns={columns} pagination={false} />
+        <Row>
+          <Col xs={24}>
+            <Card title="2022-05 至今跌幅最小 Top10">
+              <Table
+                dataSource={downTop10Data}
+                columns={downTop10Columns}
+                pagination={false}
+              />
+            </Card>
+          </Col>
+        </Row>
       </Flex>
     </Spin>
   );
