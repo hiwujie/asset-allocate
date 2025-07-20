@@ -3,24 +3,56 @@ import {
   Typography,
   Card,
   Col,
-  Statistic,
   Progress,
   Flex,
   Select,
   Spin,
+  Table,
 } from "antd";
-import { HomeOutlined, DollarOutlined, RiseOutlined } from "@ant-design/icons";
+import { HomeOutlined } from "@ant-design/icons";
 import { Line } from "@ant-design/charts";
 import { useState, useEffect } from "react";
 import { readAllCSVFiles, citys } from "./utils";
+import dayjs from "dayjs";
 
 const { Text } = Typography;
 
+const columns = [
+  {
+    title: "城市",
+    dataIndex: "city",
+  },
+  {
+    title: "最新月份",
+    dataIndex: "month",
+  },
+  {
+    title: "环比(上月=100)",
+    dataIndex: "hb",
+  },
+  {
+    title: "同比(去年同月=100)",
+    dataIndex: "tb",
+  },
+  {
+    title: "今年以来平均(上年同期=100)",
+    dataIndex: "currAvg",
+  },
+];
+
 export const HomePage = () => {
   const [allData, setAllData] = useState<
-    Record<string, Record<string, { hb: number; tb: number; cur: number }>>
+    Record<
+      string,
+      Record<string, { hb: number; tb: number; currAvg: number; cur: number }>
+    >
   >({});
-  const [selectedCities, setSelectedCities] = useState<string[]>(["北京"]);
+  const [selectedCities, setSelectedCities] = useState<string[]>([
+    "北京",
+    "上海",
+    "杭州",
+    "深圳",
+  ]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -58,6 +90,7 @@ export const HomePage = () => {
             price: cityData.cur,
             hb: cityData.hb,
             tb: cityData.tb,
+            currAvg: cityData.currAvg,
           });
         }
       });
@@ -72,6 +105,37 @@ export const HomePage = () => {
   };
 
   const chartData = generateChartData();
+
+  // 生成表格数据 - 选中城市的最新数据
+  const generateTableData = () => {
+    const tableData: any[] = [];
+
+    // 获取最新的数据文件（按文件名排序后的最后一个）
+    const latestMonth = Object.keys(allData).sort().pop();
+
+    if (latestMonth) {
+      const latestData = allData[latestMonth];
+
+      selectedCities.forEach((cityName) => {
+        const cityData = latestData[cityName];
+        if (cityData) {
+          tableData.push({
+            key: cityName,
+            city: cityName,
+            month: dayjs(latestMonth).format("YYYY年MM月"),
+            hb: cityData.hb,
+            tb: cityData.tb,
+            currAvg: cityData.currAvg,
+            cur: cityData.cur,
+          });
+        }
+      });
+    }
+
+    return tableData;
+  };
+
+  const tableData = generateTableData();
 
   const lineConfig = {
     data: chartData,
@@ -150,110 +214,8 @@ export const HomePage = () => {
           </Col>
         </Row>
 
-        {/* 统计卡片 */}
-        <Row gutter={[16, 16]}>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="当前房价"
-                value={
-                  (allData &&
-                    Object.values(allData)[0]?.[selectedCities[0]]?.cur) ||
-                  0
-                }
-                prefix={<DollarOutlined />}
-                suffix="元/㎡"
-                valueStyle={{ color: "#3f8600" }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="环比涨幅"
-                value={
-                  (allData &&
-                    Object.values(allData)[0]?.[selectedCities[0]]?.hb) ||
-                  0
-                }
-                prefix={<RiseOutlined />}
-                suffix="%"
-                valueStyle={{ color: "#cf1322" }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="同比涨幅"
-                value={
-                  (allData &&
-                    Object.values(allData)[0]?.[selectedCities[0]]?.tb) ||
-                  0
-                }
-                prefix={<RiseOutlined />}
-                suffix="%"
-                valueStyle={{ color: "#1890ff" }}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} lg={6}>
-            <Card>
-              <Statistic
-                title="选中城市"
-                value={selectedCities.length}
-                suffix={`/5`}
-                valueStyle={{ color: "#722ed1" }}
-              />
-            </Card>
-          </Col>
-        </Row>
-
-        <Row gutter={[24, 24]}>
-          <Col xs={24} lg={16}>
-            <Card title="房价走势分析" className="h-full">
-              <div className="space-y-4">
-                <div>
-                  <Text strong>当前市场趋势</Text>
-                  <Progress
-                    percent={75}
-                    status="active"
-                    strokeColor="#52c41a"
-                    className="mt-2"
-                  />
-                </div>
-                <div>
-                  <Text type="secondary">
-                    根据最新数据显示，本地区房价呈现稳定上涨趋势，
-                    建议购房者关注市场动态，合理规划购房时机。
-                  </Text>
-                </div>
-              </div>
-            </Card>
-          </Col>
-          <Col xs={24} lg={8}>
-            <Card title="购房建议" className="h-full">
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <Text>关注政策变化</Text>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <Text>评估个人经济能力</Text>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                  <Text>选择合适地段</Text>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <Text>考虑未来发展规划</Text>
-                </div>
-              </div>
-            </Card>
-          </Col>
-        </Row>
+        {/* 选中城市的环比，同比，当前平均值*/}
+        <Table dataSource={tableData} columns={columns} pagination={false} />
       </Flex>
     </Spin>
   );

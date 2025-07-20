@@ -6,6 +6,7 @@
 interface CityData {
   hb: number; // 环比
   tb: number; // 同比
+  currAvg: number; // 当前平均值
   cur: number; // 实际值
 }
 
@@ -33,8 +34,9 @@ function parseCSV(csvString: string): FileData {
 
     if (cityName) {
       data[cityName] = {
-        hb: parseFloat(values[1]) || 0, // 环比
-        tb: parseFloat(values[2]) || 0, // 同比
+        hb: parseFloat(values[1]) || 0, // 环比上月
+        tb: parseFloat(values[2]) || 0, // 同比去年
+        currAvg: parseFloat(values[3]) || 0, // 当前平均值
         cur: 0,
       };
     }
