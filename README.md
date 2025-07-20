@@ -21,8 +21,8 @@
 
 ## 👀 预览
 
-![购房指北预览1](https://github.com/user-attachments/assets/58912670-08c0-49e9-91af-b5c48e0c5f9f)
-![购房指北预览2](https://github.com/user-attachments/assets/37df8283-8f7d-45ce-8bf8-f121a3ca6e01)
+![购房指北预览1](https://github.com/user-attachments/assets/47d37538-b0ec-4387-a34a-c3796944e9be)
+![购房指北预览2](https://github.com/user-attachments/assets/9676298a-13a1-4fe6-9630-fe69add2f116)
 
 ## 🚀 快速开始
 

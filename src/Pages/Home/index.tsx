@@ -63,7 +63,7 @@ const downTop10Columns = [
   {
     title: (
       <>
-        <Text className="mr-2">最新 / 2025-05 房价</Text>
+        <Text className="mr-2">最新 / 2022-05 房价</Text>
         <Tooltip title="当前房价 / 2022-05 房价">
           <QuestionCircleOutlined className="text-sm" />
         </Tooltip>
@@ -187,9 +187,9 @@ export const HomePage = () => {
     const latestMonth = Object.keys(allData).sort().pop();
     if (latestMonth) {
       const latestData = allData[latestMonth];
-      const downTop10 = Object.entries(latestData)
-        .sort((a, b) => b[1].cur - a[1].cur)
-        .slice(0, 10);
+      const downTop10 = Object.entries(latestData).sort(
+        (a, b) => b[1].cur - a[1].cur
+      );
       downTop10.forEach(([city, data]) => {
         downTop10Data.push({
           city,
@@ -288,7 +288,7 @@ export const HomePage = () => {
 
         <Row>
           <Col xs={24}>
-            <Card title="2022-05 至今跌幅最小 Top10">
+            <Card title="2022-05 至今 70大中城市">
               <Table
                 dataSource={downTop10Data}
                 columns={downTop10Columns}
