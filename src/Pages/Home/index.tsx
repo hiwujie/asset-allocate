@@ -132,7 +132,19 @@ export const HomePage = () => {
         {/* 主要内容区域 */}
         <Row gutter={[24, 24]}>
           <Col xs={24}>
-            <Card title="房价走势图">
+            <Card
+              title={
+                <div>
+                  <Text strong className="text-lg">
+                    房价走势
+                  </Text>
+                  <Text className="text-sm ml-2 text-blue-500 font-normal">
+                    (数据来源于国家统计局, 且以 2022年5月 为基准. 设定全部城市
+                    2022年5月 房价为100)
+                  </Text>
+                </div>
+              }
+            >
               <Line {...lineConfig} />
             </Card>
           </Col>
