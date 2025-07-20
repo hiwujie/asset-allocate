@@ -1,5 +1,5 @@
 import "./App.css";
-import { Breadcrumb, Menu, Layout } from "antd";
+import { Breadcrumb, Menu, Layout, ConfigProvider } from "antd";
 import {
   createBrowserRouter,
   Navigate,
@@ -10,14 +10,16 @@ import {
 } from "react-router-dom";
 import { HomePage } from "./Pages/Home";
 import { AboutPage } from "./Pages/About";
+import Sider from "antd/es/layout/Sider";
+import { useState } from "react";
 
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 
 // 主应用组件
 function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-
+  const [collapsed, setCollapsed] = useState(true);
   const menus = [
     {
       key: "home",
@@ -29,16 +31,9 @@ function AppLayout() {
     },
   ];
 
-  const getCurrentKey = () => {
-    if (location.pathname === "/home" || location.pathname === "/")
-      return "home";
-    if (location.pathname === "/about") return "about";
-    return "home";
-  };
-
   const getBreadcrumbItems = () => {
     if (location.pathname === "/home" || location.pathname === "/") {
-      return [{ title: "Home" }];
+      return [{ title: "Dashboard" }];
     }
     if (location.pathname === "/about") {
       return [{ title: "About" }];
@@ -47,30 +42,48 @@ function AppLayout() {
   };
 
   return (
-    <Layout className="layout">
-      <Header className="header">
-        <div className="demo-logo" />
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          selectedKeys={[getCurrentKey()]}
-          items={menus}
-          className="menu"
-          onClick={(e) => {
-            navigate(`/${e.key}`);
-          }}
-        />
-      </Header>
-      <Content className="content">
-        <Breadcrumb className="breadcrumb" items={getBreadcrumbItems()} />
-        <div className="content-container">
-          <Outlet />
-        </div>
-      </Content>
-      <Footer style={{ textAlign: "center" }}>
-        ©{new Date().getFullYear()} Created by yl
-      </Footer>
-    </Layout>
+    <ConfigProvider
+      theme={{
+        components: {
+          Layout: {
+            siderBg: "#fff",
+            triggerBg: "#fff",
+            triggerColor: "#000",
+          },
+        },
+      }}
+    >
+      <Layout className="layout" hasSider>
+        <Sider
+          width={200}
+          collapsible
+          collapsed={collapsed}
+          onCollapse={(value) => setCollapsed(value)}
+        >
+          <div className="demo-logo-vertical" />
+          <Menu
+            theme="light"
+            defaultSelectedKeys={["home"]}
+            mode="inline"
+            items={menus}
+            onClick={(e) => {
+              navigate(`/${e.key}`);
+            }}
+          />
+        </Sider>
+        <Layout>
+          <Content className="content">
+            <Breadcrumb className="breadcrumb" items={getBreadcrumbItems()} />
+            <div className="content-container">
+              <Outlet />
+            </div>
+          </Content>
+          <Footer style={{ textAlign: "center" }}>
+            ©{new Date().getFullYear()} Created by yl
+          </Footer>
+        </Layout>
+      </Layout>
+    </ConfigProvider>
   );
 }
 

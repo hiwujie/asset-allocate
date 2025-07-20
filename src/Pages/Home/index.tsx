@@ -167,7 +167,7 @@ export const HomePage = () => {
         <Row gutter={{ xs: 8 }} align="middle">
           <HomeOutlined className="text-2xl" />
           <Text strong className="text-2xl ml-2">
-            购房指南
+            购房指北
           </Text>
           <div className="ml-auto">
             <Select
