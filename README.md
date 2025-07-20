@@ -19,6 +19,11 @@
 - **样式**: Tailwind CSS
 - **日期处理**: Day.js
 
+## 👀 预览
+
+![购房指北预览1](https://github.com/user-attachments/assets/58912670-08c0-49e9-91af-b5c48e0c5f9f)
+![购房指北预览2](https://github.com/user-attachments/assets/37df8283-8f7d-45ce-8bf8-f121a3ca6e01)
+
 ## 🚀 快速开始
 
 ### 环境要求
