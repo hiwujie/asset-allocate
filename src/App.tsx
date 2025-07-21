@@ -98,6 +98,14 @@ function App() {
         { path: "about", element: <AboutPage /> },
       ],
     },
+    {
+      path: "/home",
+      element: <HomePage />,
+    },
+    {
+      path: "/about",
+      element: <AboutPage />,
+    },
   ]);
 
   return <RouterProvider router={router} />;
