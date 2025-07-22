@@ -8,7 +8,7 @@ export const AboutPage = () => {
     <Flex vertical gap={16}>
       <Row gutter={[24, 24]}>
         <Col xs={24}>
-          <Card title="简介">
+          <Card title="我是谁？">
             <Row>
               <Text>一个全栈开发工程师，</Text>
             </Row>
@@ -23,7 +23,7 @@ export const AboutPage = () => {
       </Row>
       <Row gutter={[24, 24]}>
         <Col xs={24}>
-          <Card title="在哪可以找到我">
+          <Card title="在哪可以找到我？">
             <Row>
               <Text>公众号:</Text>
               <Text className="ml-2">
