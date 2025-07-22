@@ -235,6 +235,13 @@ export const HomePage = () => {
           <Text strong className="text-2xl ml-2">
             购房指北
           </Text>
+          <Text className="text-sm ml-2 text-blue-500 font-normal">
+            (
+            {`数据来源于国家统计局, 且以2022年5月为基准. 设定全部城市2022年5月房价为100. 最新月份为: ${dayjs(
+              chartData[chartData.length - 1].month
+            ).format("YYYY年MM月")}`}
+            )
+          </Text>
         </Row>
 
         {/* 主要内容区域 */}
@@ -243,15 +250,9 @@ export const HomePage = () => {
             <Card
               title={
                 <Flex justify="space-between" align="center">
-                  <div>
-                    <Text strong className="text-lg">
-                      房价走势
-                    </Text>
-                    <Text className="text-sm ml-2 text-blue-500 font-normal">
-                      (数据来源于国家统计局, 且以 2022年5月 为基准. 设定全部城市
-                      2022年5月 房价为100)
-                    </Text>
-                  </div>
+                  <Text strong className="text-lg">
+                    房价走势
+                  </Text>
                   <Select
                     mode="multiple"
                     value={selectedCities}
