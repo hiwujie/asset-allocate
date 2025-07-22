@@ -18,6 +18,9 @@ export const AboutPage = () => {
             <Row>
               <Text>有一个公众号用来记录一些日常生活，欢迎关注。</Text>
             </Row>
+            <Row className="mt-4">
+              <Text>Respect!</Text>
+            </Row>
           </Card>
         </Col>
       </Row>
