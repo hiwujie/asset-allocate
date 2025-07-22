@@ -235,28 +235,6 @@ export const HomePage = () => {
           <Text strong className="text-2xl ml-2">
             购房指北
           </Text>
-          <div className="ml-auto">
-            <Select
-              mode="multiple"
-              value={selectedCities}
-              onChange={(values) => {
-                // 限制最多选择5个城市
-                if (values.length <= 5) {
-                  setSelectedCities(values);
-                } else {
-                  // 如果超过5个，则移除第一个，并添加新的
-                  const newValues = values.slice(1, 5);
-                  newValues.push(values[values.length - 1]);
-                  setSelectedCities(newValues);
-                }
-              }}
-              style={{ width: 500 }}
-              placeholder="选择城市（最多5个）"
-              maxTagCount={5}
-              maxTagTextLength={5}
-              options={citys.map((city) => ({ label: city, value: city }))}
-            />
-          </div>
         </Row>
 
         {/* 主要内容区域 */}
@@ -264,15 +242,40 @@ export const HomePage = () => {
           <Col xs={24}>
             <Card
               title={
-                <div>
-                  <Text strong className="text-lg">
-                    房价走势
-                  </Text>
-                  <Text className="text-sm ml-2 text-blue-500 font-normal">
-                    (数据来源于国家统计局, 且以 2022年5月 为基准. 设定全部城市
-                    2022年5月 房价为100)
-                  </Text>
-                </div>
+                <Flex justify="space-between" align="center">
+                  <div>
+                    <Text strong className="text-lg">
+                      房价走势
+                    </Text>
+                    <Text className="text-sm ml-2 text-blue-500 font-normal">
+                      (数据来源于国家统计局, 且以 2022年5月 为基准. 设定全部城市
+                      2022年5月 房价为100)
+                    </Text>
+                  </div>
+                  <Select
+                    mode="multiple"
+                    value={selectedCities}
+                    onChange={(values) => {
+                      // 限制最多选择5个城市
+                      if (values.length <= 5) {
+                        setSelectedCities(values);
+                      } else {
+                        // 如果超过5个，则移除第一个，并添加新的
+                        const newValues = values.slice(1, 5);
+                        newValues.push(values[values.length - 1]);
+                        setSelectedCities(newValues);
+                      }
+                    }}
+                    style={{ width: 450 }}
+                    placeholder="选择城市（最多5个）"
+                    maxTagCount={5}
+                    maxTagTextLength={5}
+                    options={citys.map((city) => ({
+                      label: city,
+                      value: city,
+                    }))}
+                  />
+                </Flex>
               }
             >
               <Line {...lineConfig} />
