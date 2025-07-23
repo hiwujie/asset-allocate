@@ -291,7 +291,7 @@ export const HomePage = () => {
 
         <Row>
           <Col xs={24}>
-            <Card title="2022-05 至今 70大中城市">
+            <Card title="2022-05 至今70大中城市">
               <Table
                 dataSource={downTop10Data}
                 columns={downTop10Columns}
