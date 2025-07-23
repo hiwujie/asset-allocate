@@ -224,6 +224,7 @@ export const HomePage = () => {
     style: {
       lineWidth: 2,
     },
+    animate: { enter: { type: "pathIn", duration: 1000 } },
   };
 
   return (
