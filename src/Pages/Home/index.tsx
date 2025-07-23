@@ -237,9 +237,7 @@ export const HomePage = () => {
           </Text>
           <Text className="text-sm ml-2 text-blue-500 font-normal">
             (
-            {`数据来源于国家统计局, 且以2022年5月为基准. 设定全部城市2022年5月房价为100. 最新月份为: ${dayjs(
-              chartData[chartData.length - 1].month
-            ).format("YYYY年MM月")}`}
+            {`数据来源于国家统计局, 且以2022年5月为基准. 设定全部城市2022年5月房价为100. 持续更新中...`}
             )
           </Text>
         </Row>
