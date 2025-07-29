@@ -191,6 +191,7 @@ export const HomePage = () => {
       sortedAssets.forEach(([asset, data]) => {
         const totalReturn = ((data.currentValue - 2500) / 2500) * 100;
         performanceData.push({
+          key: asset,
           asset,
           currentValue: data.currentValue,
           totalReturn,
