@@ -185,9 +185,12 @@ export const HomePage = () => {
     const latestMonth = Object.keys(allData).sort().pop();
     if (latestMonth) {
       const latestData = allData[latestMonth];
-      const sortedAssets = Object.entries(latestData).sort(
-        (a, b) => b[1].currentValue - a[1].currentValue
-      );
+      // 只显示4类投资资产，按当前价值排序
+      const investmentAssets = assets.filter(asset => latestData[asset]);
+      const sortedAssets = investmentAssets
+        .map(asset => [asset, latestData[asset]])
+        .sort((a, b) => b[1].currentValue - a[1].currentValue);
+      
       sortedAssets.forEach(([asset, data]) => {
         const totalReturn = ((data.currentValue - 2500) / 2500) * 100;
         performanceData.push({
