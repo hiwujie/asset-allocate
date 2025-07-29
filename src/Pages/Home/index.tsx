@@ -11,78 +11,77 @@ import {
   Tooltip,
   Divider,
 } from "antd";
-import { HomeOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { LineChartOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { Line } from "@ant-design/charts";
 import { useState, useEffect } from "react";
-import { readAllCSVFiles, citys } from "./utils";
+import { readAllCSVFiles, assets } from "./utils";
 import dayjs from "dayjs";
 
 const { Text } = Typography;
 
 const columns = [
   {
-    title: "城市",
-    dataIndex: "city",
+    title: "资产",
+    dataIndex: "asset",
   },
   {
     title: "最新月份",
     dataIndex: "month",
   },
   {
-    title: "环比(上月=100)",
-    dataIndex: "hb",
-  },
-  {
-    title: "同比(去年同月=100)",
-    dataIndex: "tb",
-  },
-  {
-    title: "今年以来平均(上年同期=100)",
-    dataIndex: "currAvg",
-  },
-  {
-    title: "相比 2022-05 涨跌幅",
-    dataIndex: "cur",
-    render: (_: number, record: any) => {
-      const down = Number((record.cur - 100).toFixed(2));
-      if (down < 0) {
-        return <Tag color="green">{down}%</Tag>;
-      } else if (down > 0) {
-        return <Tag color="red">{down}%</Tag>;
-      }
-      return <Tag color="default">持平</Tag>;
+    title: "月度收益率(%)",
+    dataIndex: "monthlyReturn",
+    render: (value: number) => {
+      const color = value >= 0 ? "green" : "red";
+      return <Tag color={color}>{value.toFixed(2)}%</Tag>;
     },
+  },
+  {
+    title: "年化收益率(%)",
+    dataIndex: "annualReturn",
+    render: (value: number) => {
+      const color = value >= 0 ? "green" : "red";
+      return <Tag color={color}>{value.toFixed(2)}%</Tag>;
+    },
+  },
+  {
+    title: "今年以来收益率(%)",
+    dataIndex: "ytdReturn",
+    render: (value: number) => {
+      const color = value >= 0 ? "green" : "red";
+      return <Tag color={color}>{value.toFixed(2)}%</Tag>;
+    },
+  },
+  {
+    title: "当前价值($)",
+    dataIndex: "currentValue",
+    render: (value: number) => `$${value.toLocaleString()}`,
   },
 ];
 
-const downTop10Columns = [
+const performanceColumns = [
   {
-    title: "城市",
-    dataIndex: "city",
+    title: "资产",
+    dataIndex: "asset",
   },
   {
     title: (
       <>
-        <Text className="mr-2">最新 / 2022-05 房价</Text>
-        <Tooltip title="当前房价 / 2022-05 房价">
+        <Text className="mr-2">当前价值 / 初始投资</Text>
+        <Tooltip title="当前价值 / $2,500 (初始25%配置)">
           <QuestionCircleOutlined className="text-sm" />
         </Tooltip>
       </>
     ),
-    dataIndex: "cur",
-    render: (text: number) => `${text} / 100`,
+    dataIndex: "currentValue",
+    render: (value: number) => `$${value.toLocaleString()} / $2,500`,
   },
   {
-    title: "涨跌幅",
-    dataIndex: "cur",
-    render: (text: number) => {
-      const down = Number((text - 100).toFixed(2));
-      if (down < 0) {
-        return <Tag color="green">{down}%</Tag>;
-      } else if (down > 0) {
-        return <Tag color="red">{down}%</Tag>;
-      }
-      return null;
+    title: "总收益率",
+    dataIndex: "totalReturn",
+    render: (value: number) => {
+      const color = value >= 0 ? "green" : "red";
+      return <Tag color={color}>{value.toFixed(2)}%</Tag>;
     },
   },
 ];
@@ -91,14 +90,14 @@ export const HomePage = () => {
   const [allData, setAllData] = useState<
     Record<
       string,
-      Record<string, { hb: number; tb: number; currAvg: number; cur: number }>
+      Record<string, { monthlyReturn: number; annualReturn: number; ytdReturn: number; currentValue: number }>
     >
   >({});
-  const [selectedCities, setSelectedCities] = useState<string[]>([
-    "北京",
-    "上海",
-    "杭州",
-    "深圳",
+  const [selectedAssets, setSelectedAssets] = useState<string[]>([
+    "股票",
+    "国债",
+    "现金",
+    "黄金",
   ]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -125,19 +124,18 @@ export const HomePage = () => {
     Object.entries(allData).forEach(([fileName, fileData]: [string, any]) => {
       const month = fileName;
 
-      // 为每个选中的城市生成数据
-      selectedCities.forEach((cityName) => {
-        const cityData = fileData[cityName];
+      // 为每个选中的资产生成数据
+      selectedAssets.forEach((assetName) => {
+        const assetData = fileData[assetName];
 
-        if (cityData && cityData.cur > 0) {
-          // 确保有有效数据
+        if (assetData && assetData.currentValue > 0) {
           chartData.push({
             month,
-            city: cityName,
-            price: cityData.cur,
-            hb: cityData.hb,
-            tb: cityData.tb,
-            currAvg: cityData.currAvg,
+            asset: assetName,
+            value: assetData.currentValue,
+            monthlyReturn: assetData.monthlyReturn,
+            annualReturn: assetData.annualReturn,
+            ytdReturn: assetData.ytdReturn,
           });
         }
       });
@@ -153,7 +151,7 @@ export const HomePage = () => {
 
   const chartData = generateChartData();
 
-  // 生成表格数据 - 选中城市的最新数据
+  // 生成表格数据 - 选中资产的最新数据
   const generateTableData = () => {
     const tableData: any[] = [];
 
@@ -163,17 +161,17 @@ export const HomePage = () => {
     if (latestMonth) {
       const latestData = allData[latestMonth];
 
-      selectedCities.forEach((cityName) => {
-        const cityData = latestData[cityName];
-        if (cityData) {
+      selectedAssets.forEach((assetName) => {
+        const assetData = latestData[assetName];
+        if (assetData) {
           tableData.push({
-            key: cityName,
-            city: cityName,
+            key: assetName,
+            asset: assetName,
             month: dayjs(latestMonth).format("YYYY年MM月"),
-            hb: cityData.hb,
-            tb: cityData.tb,
-            currAvg: cityData.currAvg,
-            cur: cityData.cur,
+            monthlyReturn: assetData.monthlyReturn,
+            annualReturn: assetData.annualReturn,
+            ytdReturn: assetData.ytdReturn,
+            currentValue: assetData.currentValue,
           });
         }
       });
@@ -182,37 +180,38 @@ export const HomePage = () => {
     return tableData;
   };
 
-  const generateDownTop10Data = () => {
-    const downTop10Data: any[] = [];
+  const generatePerformanceData = () => {
+    const performanceData: any[] = [];
     const latestMonth = Object.keys(allData).sort().pop();
     if (latestMonth) {
       const latestData = allData[latestMonth];
-      const downTop10 = Object.entries(latestData).sort(
-        (a, b) => b[1].cur - a[1].cur
+      const sortedAssets = Object.entries(latestData).sort(
+        (a, b) => b[1].currentValue - a[1].currentValue
       );
-      downTop10.forEach(([city, data]) => {
-        downTop10Data.push({
-          city,
-          cur: data.cur,
+      sortedAssets.forEach(([asset, data]) => {
+        const totalReturn = ((data.currentValue - 2500) / 2500) * 100;
+        performanceData.push({
+          asset,
+          currentValue: data.currentValue,
+          totalReturn,
         });
       });
     }
-    return downTop10Data;
+    return performanceData;
   };
 
   const tableData = generateTableData();
-  const downTop10Data = generateDownTop10Data();
+  const performanceData = generatePerformanceData();
 
   const lineConfig = {
     data: chartData,
     xField: "month",
-    yField: "price",
-    colorField: "city", // 按城市区分颜色
+    yField: "value",
+    colorField: "asset", // 按资产区分颜色
     shapeField: "smooth",
     scale: {
       y: {
-        domainMin: 70, // 纵轴起始值
-        domainMax: 110, // 纵轴最大值
+        domainMin: 1000, // 纵轴起始值
         nice: true, // 自动调整刻度为美观的数值
       },
     },
@@ -232,13 +231,13 @@ export const HomePage = () => {
       <Flex vertical gap={16}>
         {/* 页面标题 */}
         <Row gutter={{ xs: 8 }} align="middle">
-          <HomeOutlined className="text-2xl" />
+          <LineChartOutlined className="text-2xl" />
           <Text strong className="text-2xl ml-2">
-            购房指北
+            投资组合分析
           </Text>
           <Text className="text-sm ml-2 text-blue-500 font-normal">
             (
-            {`数据来源于国家统计局, 且以2022年5月为基准. 设定全部城市2022年5月房价为100. 持续更新中...`}
+            {`多元化投资组合表现追踪，起始投资$10,000，每种资产配置25%，数据从2000年1月开始`}
             )
           </Text>
         </Row>
@@ -250,29 +249,29 @@ export const HomePage = () => {
               title={
                 <Flex justify="space-between" align="center">
                   <Text strong className="text-lg">
-                    房价走势
+                    投资组合价值走势
                   </Text>
                   <Select
                     mode="multiple"
-                    value={selectedCities}
+                    value={selectedAssets}
                     onChange={(values) => {
-                      // 限制最多选择5个城市
-                      if (values.length <= 5) {
-                        setSelectedCities(values);
+                      // 限制最多选择4个资产
+                      if (values.length <= 4) {
+                        setSelectedAssets(values);
                       } else {
-                        // 如果超过5个，则移除第一个，并添加新的
-                        const newValues = values.slice(1, 5);
+                        // 如果超过4个，则移除第一个，并添加新的
+                        const newValues = values.slice(1, 4);
                         newValues.push(values[values.length - 1]);
-                        setSelectedCities(newValues);
+                        setSelectedAssets(newValues);
                       }
                     }}
-                    style={{ width: 450 }}
-                    placeholder="选择城市（最多5个）"
-                    maxTagCount={5}
+                    style={{ width: 350 }}
+                    placeholder="选择资产（最多4个）"
+                    maxTagCount={4}
                     maxTagTextLength={5}
-                    options={citys.map((city) => ({
-                      label: city,
-                      value: city,
+                    options={assets.map((asset) => ({
+                      label: asset,
+                      value: asset,
                     }))}
                   />
                 </Flex>
@@ -291,10 +290,10 @@ export const HomePage = () => {
 
         <Row>
           <Col xs={24}>
-            <Card title="2022-05 至今70大中城市">
+            <Card title="投资组合整体表现">
               <Table
-                dataSource={downTop10Data}
-                columns={downTop10Columns}
+                dataSource={performanceData}
+                columns={performanceColumns}
                 pagination={false}
               />
             </Card>

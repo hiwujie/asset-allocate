@@ -23,22 +23,22 @@ function AppLayout() {
   const menus = [
     {
       key: "home",
-      label: "Home",
+      label: "投资组合",
     },
     {
       key: "about",
-      label: "About",
+      label: "关于",
     },
   ];
 
   const getBreadcrumbItems = () => {
     if (location.pathname === "/home" || location.pathname === "/") {
-      return [{ title: "Dashboard" }];
+      return [{ title: "投资组合分析" }];
     }
     if (location.pathname === "/about") {
-      return [{ title: "About" }];
+      return [{ title: "关于" }];
     }
-    return [{ title: "Home" }];
+    return [{ title: "投资组合分析" }];
   };
 
   return (

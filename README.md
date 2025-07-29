@@ -1,14 +1,15 @@
-# 购房指北 🏠
+# 投资组合分析 📈
 
-一个基于国家统计局房价指数数据的房价走势可视化工具，帮助用户了解各城市房价变化趋势。
+一个基于历史数据的投资组合表现可视化工具，帮助用户了解多元化投资组合的长期表现。
 
 ## 📊 项目介绍
 
-本项目收集了国家统计局的房价指数数据，将其制作成直观的趋势图和详细的数据列表，方便用户：
+本项目展示了一个包含股票、国债、现金和黄金四种资产的投资组合表现，将其制作成直观的趋势图和详细的数据列表，方便用户：
 
-- 📈 **房价走势可视化** - 多城市房价指数趋势图对比
-- 📋 **详细数据展示** - 环比、同比、平均值等关键指标
-- 🎯 **多城市对比** - 支持同时选择多个城市进行对比
+- 📈 **投资组合走势可视化** - 多资产价值趋势图对比
+- 📋 **详细数据展示** - 月度收益率、年化收益率、年初至今收益率等关键指标
+- 🎯 **多资产对比** - 支持同时选择多个资产进行对比
+- 💰 **投资回报分析** - 基于$10,000初始投资的长期表现追踪
 
 ## 🛠️ 技术栈
 
@@ -19,12 +20,15 @@
 - **样式**: Tailwind CSS
 - **日期处理**: Day.js
 
-## 👀 预览
+## 💼 投资组合配置
 
-**站点**: [点我预览](https://how-to-buy-house.vercel.app)
-
-![购房指北预览1](https://github.com/user-attachments/assets/47d37538-b0ec-4387-a34a-c3796944e9be)
-![购房指北预览2](https://github.com/user-attachments/assets/9676298a-13a1-4fe6-9630-fe69add2f116)
+- **起始投资**: $10,000
+- **起始日期**: 2000年1月
+- **资产配置**: 
+  - 股票: 25% ($2,500)
+  - 国债: 25% ($2,500)
+  - 现金: 25% ($2,500)
+  - 黄金: 25% ($2,500)
 
 ## 🚀 快速开始
 
@@ -64,7 +68,7 @@ yarn preview
 ## 📁 项目结构
 
 ```
-how-to-buy-house/
+portfolio-analysis/
 ├── public/                 # 静态资源
 ├── src/
 │   ├── Components/         # 通用组件
@@ -82,25 +86,25 @@ how-to-buy-house/
 
 ## 📊 数据说明
 
-### 数据来源
+### 数据格式
 
-- **数据源**: 国家统计局
+- **数据源**: 历史ETF价格数据
 - **数据格式**: CSV 文件，文件名格式为 `YYYYMM.csv`
-- **基准时间**: 2022 年 5 月（设定全部城市房价指数为 100）
+- **基准时间**: 2000年1月（设定每种资产初始投资为$2,500）
 
 ### 数据字段
 
-- **环比**: 与上月相比的房价指数变化
-- **同比**: 与去年同期相比的房价指数变化
-- **今年以来平均**: 今年以来平均房价指数（上年同期=100）
-- **当前房价**: 基于环比数据计算的实际房价指数
+- **月度收益率**: 当月相对于上月的收益率变化
+- **年化收益率**: 年化后的收益率
+- **年初至今收益率**: 从年初到当前月份的累计收益率
+- **当前价值**: 基于月度收益率计算的实际投资价值
 
 ## 🎨 功能特性
 
-- ✅ **多城市选择** - 支持同时选择多个城市
-- ✅ **趋势图对比** - 直观显示房价走势变化
-- ✅ **数据表格** - 详细展示各项指标数据
-- ✅ **实时数据** - 基于最新统计数据
+- ✅ **多资产选择** - 支持同时选择多个资产类别
+- ✅ **趋势图对比** - 直观显示投资组合价值变化
+- ✅ **数据表格** - 详细展示各项收益率指标
+- ✅ **实时数据** - 基于最新市场数据更新
 
 ## 🤝 贡献指南
 
@@ -111,8 +115,8 @@ how-to-buy-house/
 1. **Fork 本仓库**
 
    ```bash
-   git clone https://github.com/your-username/how-to-buy-house.git
-   cd how-to-buy-house
+   git clone https://github.com/your-username/portfolio-analysis.git
+   cd portfolio-analysis
    ```
 
 2. **创建功能分支**
@@ -137,7 +141,7 @@ how-to-buy-house/
    ```
 
 5. **创建 Pull Request**
-   - 访问 [GitHub Pull Requests](https://github.com/your-username/how-to-buy-house/pulls)
+   - 访问 [GitHub Pull Requests](https://github.com/your-username/portfolio-analysis/pulls)
    - 点击 "New Pull Request"
    - 选择你的功能分支
    - 填写详细的描述信息
@@ -163,7 +167,7 @@ how-to-buy-house/
 
 ## 📄 许可证
 
-本项目采用 [MIT 许可证](LICENSE)。
+本项目采用 [Apache 2.0 许可证](LICENSE)。
 
 ## ⭐ 支持项目
 
@@ -171,10 +175,12 @@ how-to-buy-house/
 
 ## 📞 联系我们
 
-- 项目地址: [GitHub Repository](https://github.com/your-username/how-to-buy-house)
-- 问题反馈: [Issues](https://github.com/your-username/how-to-buy-house/issues)
-- 功能建议: [Discussions](https://github.com/your-username/how-to-buy-house/discussions)
+- 项目地址: [GitHub Repository](https://github.com/your-username/portfolio-analysis)
+- 问题反馈: [Issues](https://github.com/your-username/portfolio-analysis/issues)
+- 功能建议: [Discussions](https://github.com/your-username/portfolio-analysis/discussions)
 
 ---
 
-**购房指北** - 让房价数据更透明，让购房决策更明智 🏠✨
+**投资组合分析** - 让投资数据更透明，让投资决策更明智 📈✨
+
+**免责声明**: 本工具仅供教育和研究目的，不构成投资建议。投资有风险，入市需谨慎。
