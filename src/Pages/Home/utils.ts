@@ -1,7 +1,11 @@
-// 读取 ./data 目录下的所有csv文件, 文件名格式为：YYYYMM.csv，并返回一个对象，对象的key是文件名，value是文件内容
-// 文件内容是csv格式，第一行是标题，第二行开始是数据
-// 数据格式是：资产,月度收益率,年化收益率,年初至今收益率,当前价值
-// 返回的对象格式是：{ 文件名: { 资产名: { monthlyReturn:xxx, annualReturn:xxx, ytdReturn:xxx, currentValue:xxx } } }
+// 读取新的投资组合数据
+interface PortfolioData {
+  date: string;
+  lazyPermanent: number;
+  aggressive: number;
+  portfolio6040: number;
+  vanguard500: number;
+}
 
 interface AssetData {
   monthlyReturn: number; // 月度收益率
@@ -46,6 +50,50 @@ function parseCSV(csvString: string): FileData {
 }
 
 /**
+ * 解析投资组合CSV数据
+ * @param csvString CSV 字符串内容
+ * @returns 解析后的投资组合数据数组
+ */
+function parsePortfolioCSV(csvString: string): PortfolioData[] {
+  const lines = csvString.trim().split("\n");
+  const data: PortfolioData[] = [];
+
+  // 从第二行开始解析数据（跳过标题行）
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split(",").map((v) => v.trim());
+    
+    if (values.length >= 5) {
+      data.push({
+        date: values[0],
+        lazyPermanent: parseFloat(values[1]) || 0,
+        aggressive: parseFloat(values[2]) || 0,
+        portfolio6040: parseFloat(values[3]) || 0,
+        vanguard500: parseFloat(values[4]) || 0,
+      });
+    }
+  }
+
+  return data;
+}
+
+/**
+ * 读取投资组合数据
+ * @returns Promise<PortfolioData[]>
+ */
+export async function readPortfolioData(): Promise<PortfolioData[]> {
+  try {
+    // 导入投资组合CSV文件
+    const csvModule = await import("./data/combine.csv?raw");
+    const csvString = csvModule.default;
+    
+    return parsePortfolioCSV(csvString);
+  } catch (error) {
+    console.error("Error reading portfolio data:", error);
+    return [];
+  }
+}
+
+/**
  * 读取 ./data 目录下的所有 CSV 文件
  * 文件名格式为：YYYYMM.csv
  * @returns Promise<AllData>
@@ -60,11 +108,11 @@ export async function readAllCSVFiles(): Promise<AllData> {
       import: "default",
     });
 
-    // 获取所有匹配的文件并排序
+    // 获取所有匹配的文件并排序，排除combine.csv
     const sortedFiles = Object.entries(csvFiles)
       .filter(([filePath]) => {
         const fileName = filePath.split("/").pop() || "";
-        return fileName.match(/^\d{6}\.csv$/);
+        return fileName.match(/^\d{6}\.csv$/) && fileName !== "combine.csv";
       })
       .sort(([filePathA], [filePathB]) => {
         const fileNameA = filePathA.split("/").pop() || "";
@@ -117,3 +165,17 @@ export const assets = [
   "现金",
   "黄金",
 ];
+
+export const portfolios = [
+  "lazy_permanent",
+  "aggressive", 
+  "6040",
+  "vanguard_500",
+];
+
+export const portfolioNames = {
+  lazy_permanent: "Lazy Permanent",
+  aggressive: "Aggressive",
+  "6040": "60/40",
+  vanguard_500: "Vanguard 500 Index",
+};
